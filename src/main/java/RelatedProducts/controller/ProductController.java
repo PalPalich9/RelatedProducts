@@ -4,6 +4,7 @@ package RelatedProducts.controller;
 import RelatedProducts.model.dto.ProductDto;
 import RelatedProducts.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +18,8 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     @GetMapping("/analogues")
-    public List<ProductDto> getAnalogues(){
-        return productService.getAnalogues();
+    public ResponseEntity<List<ProductDto>> getAnalogues(){
+        return ResponseEntity.ok(productService.getAnalogues());
     }
 
 }
