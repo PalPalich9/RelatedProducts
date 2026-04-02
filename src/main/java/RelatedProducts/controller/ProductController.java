@@ -17,7 +17,7 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
     @GetMapping("/analogues")
-    public List<ProductDto> saveProductsFromFile(){
+    public List<ProductDto> getAnalogues(){
         return productService.getAnalogues();
     }
 
