@@ -1,7 +1,9 @@
 package RelatedProducts.service;
 
+import RelatedProducts.exception.ResourceNotFoundException;
 import RelatedProducts.model.dto.ProductDto;
 import RelatedProducts.model.entity.Product;
+import RelatedProducts.model.mapper.ProductMapper;
 import RelatedProducts.repository.ProductRepository;
 import RelatedProducts.service.util.ExcelUtil;
 import jakarta.persistence.Column;
@@ -17,15 +19,43 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.StringUtils.isNumeric;
+
+
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    public List<ProductDto> getAnalogues(){
+    private final ProductMapper productMapper;
+    private static final Pattern UUID_PATTERN =
+            Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
+
+    public List<ProductDto> getAnalogues(String productId){
+        Product product = finProductByIdentifier(productId)
+                .orElseThrow(() -> new ResourceNotFoundException(Product.class, productId));
         List<ProductDto> analogues = new ArrayList<>();
+        analogues.add(productMapper.toDto(product));
         return analogues;
+    }
+    private boolean isUuid(String identifier){
+        return identifier != null && UUID_PATTERN.matcher(identifier).matches();
+    }
+    private Optional<Product> finProductByIdentifier(String identifier){
+        if(isNumeric(identifier)){
+            return productRepository.findById(Long.parseLong(identifier));
+        }
+        else if(isUuid(identifier)){
+            return productRepository.findByExternalCode(UUID.fromString(identifier));
+        }
+        else{
+            return productRepository.findByCharacterCode(identifier);
+        }
     }
     public void saveProductsFromFile(){
         try{
