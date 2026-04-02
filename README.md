@@ -1,1 +1,5 @@
- docker-compose up --build  
+###Запуск контейнера 
+```bash
+docker-compose up --build  
+
+ 
